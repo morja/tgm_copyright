@@ -2,6 +2,10 @@
 namespace TGM\TgmCopyright\Domain\Model;
 
 
+use TYPO3\CMS\Core\Http\NormalizedParams;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Domain\Model\FileReference;
+
 /***************************************************************
  *
  *  Copyright notice
@@ -30,7 +34,7 @@ namespace TGM\TgmCopyright\Domain\Model;
 /**
  * Copyright
  */
-class CopyrightReference extends \TYPO3\CMS\Extbase\Domain\Model\FileReference
+class CopyrightReference extends FileReference
 {
 
     /**
@@ -95,7 +99,7 @@ class CopyrightReference extends \TYPO3\CMS\Extbase\Domain\Model\FileReference
             if($this->getOriginalResource()->getProperty('title')) {
                 return $this->getOriginalResource()->getProperty('title');
             }
-        } catch(\Exception $e) {
+        } catch(\Exception) {
             // May not exists and causes error
         }
         return false;
@@ -113,7 +117,7 @@ class CopyrightReference extends \TYPO3\CMS\Extbase\Domain\Model\FileReference
             if($this->getOriginalResource()->getProperty('description')) {
                 return $this->getOriginalResource()->getProperty('description');
             }
-        } catch(\Exception $e) {
+        } catch(\Exception) {
             // May not exists and causes error
         }
         return false;
@@ -126,15 +130,15 @@ class CopyrightReference extends \TYPO3\CMS\Extbase\Domain\Model\FileReference
     {
         try {
             $originalResource = $this->getOriginalResource();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // May not exists
             return '';
         }
         if($originalResource->getProperty('description')) {
             return $originalResource->getProperty('description');
         }
-        if(false === \TYPO3\CMS\Core\Utility\GeneralUtility::isValidUrl($originalResource->getPublicUrl())) {
-            /** @var \TYPO3\CMS\Core\Http\NormalizedParams $requestAttributes */
+        if(false === GeneralUtility::isValidUrl($originalResource->getPublicUrl())) {
+            /** @var NormalizedParams $requestAttributes */
             $requestAttributes = $GLOBALS['TYPO3_REQUEST']->getAttributes()['normalizedParams'];
             return $requestAttributes->getRequestHost() . '/'
                 . ltrim($this->getOriginalResource()->getPublicUrl(), '/');
@@ -153,7 +157,7 @@ class CopyrightReference extends \TYPO3\CMS\Extbase\Domain\Model\FileReference
     /**
      * @param string $tablenames
      */
-    public function setTablenames($tablenames)
+    public function setTablenames($tablenames): void
     {
         $this->tablenames = $tablenames;
     }
@@ -169,7 +173,7 @@ class CopyrightReference extends \TYPO3\CMS\Extbase\Domain\Model\FileReference
 	/**
 	 * @param int $uidForeign
 	 */
-	public function setUidForeign($uidForeign)
+	public function setUidForeign($uidForeign): void
 	{
 		$this->uidForeign = $uidForeign;
 	}
@@ -185,7 +189,7 @@ class CopyrightReference extends \TYPO3\CMS\Extbase\Domain\Model\FileReference
     /**
      * @param array $usagePids
      */
-    public function setUsagePids($usagePids)
+    public function setUsagePids($usagePids): void
     {
         $this->usagePids = $usagePids;
     }
@@ -201,7 +205,7 @@ class CopyrightReference extends \TYPO3\CMS\Extbase\Domain\Model\FileReference
     /**
      * @param string $additionalLinkParams
      */
-    public function setAdditionalLinkParams($additionalLinkParams)
+    public function setAdditionalLinkParams($additionalLinkParams): void
     {
         $this->additionalLinkParams = $additionalLinkParams;
     }

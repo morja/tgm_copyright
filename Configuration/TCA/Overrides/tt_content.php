@@ -10,5 +10,5 @@ defined('TYPO3') or die();
     );
 })();
 
-$GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist']['tgmcopyright_main'] = 'pi_flexform';
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue('tgmcopyright_main', 'FILE:EXT:tgm_copyright/Configuration/Flexform/flexform_main.xml');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('tt_content', '--div--;Configuration,pi_flexform,', 'tgmcopyright_main', 'after:subheader');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue('*', 'FILE:EXT:tgm_copyright/Configuration/Flexform/flexform_main.xml', 'tgmcopyright_main');

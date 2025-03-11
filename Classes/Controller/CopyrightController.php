@@ -26,33 +26,34 @@ namespace TGM\TgmCopyright\Controller;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
+use Psr\Http\Message\ResponseInterface;
+use TGM\TgmCopyright\Domain\Model\CopyrightReference;
+use TGM\TgmCopyright\Domain\Repository\CopyrightReferenceRepository;
+use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
  * CopyrightController
  */
-class CopyrightController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class CopyrightController extends ActionController
 {
 
-    /**
-     * copyrightRepository
-     * @var \TGM\TgmCopyright\Domain\Repository\CopyrightReferenceRepository
-     */
-    protected $copyrightReferenceRepository = NULL;
-
-    /**
-     * @param \TGM\TgmCopyright\Domain\Repository\CopyrightReferenceRepository $copyrightReferenceRepository
-     */
-    public function injectCopyrightReferenceRepository(\TGM\TgmCopyright\Domain\Repository\CopyrightReferenceRepository $copyrightReferenceRepository) {
-        $this->copyrightReferenceRepository = $copyrightReferenceRepository;
+    public function __construct(
+        /**
+         * copyrightRepository
+         */
+        protected CopyrightReferenceRepository $copyrightReferenceRepository
+    )
+    {
     }
-    
     /**
      * action list
-     * @return void
      */
-    public function listAction()
+    public function listAction(): ResponseInterface
     {
         if(false === isset($this->settings['onlyCurrentPage'])) {
             $this->settings['onlyCurrentPage'] = false;
@@ -72,11 +73,11 @@ class CopyrightController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
             'copyrightReferences' => $copyrightReferences,
             'copyrights' => $copyrightReferences,
         ]);
-        
+
         return $this->htmlResponse();
     }
 
-    public function initializeSitemapAction()
+    public function initializeSitemapAction(): void
     {
         $this->request = $this->request->withFormat('xml');
         // $this->request->setFormat('xml');
@@ -84,18 +85,17 @@ class CopyrightController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
 
     /**
      * action sitemap
-     * @return void
      */
-    public function sitemapAction()
+    public function sitemapAction(): ResponseInterface
     {
-        $groupedReferences = array();
+        $groupedReferences = [];
         $copyrightReferences = $this->copyrightReferenceRepository->findForSitemap($this->settings['rootlines']);
 
         if(count($copyrightReferences) > 0) {
 
             $this->processExtensionReferences($copyrightReferences);
 
-            /** @var \TGM\TgmCopyright\Domain\Model\CopyrightReference $copyrightReference */
+            /** @var CopyrightReference $copyrightReference */
             foreach($copyrightReferences as $copyrightReference) {
                 foreach ($copyrightReference->getUsagePids() as $usagePid) {
 
@@ -131,24 +131,20 @@ class CopyrightController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
         }
 
         $this->view->assign('groupedReferences', $groupedReferences);
-        
+
         return $this->htmlResponse();
     }
 
-    /**
-     * @param \TYPO3\CMS\Extbase\Persistence\QueryResultInterface $copyrightReferences
-     * @return void
-     */
-    private function processExtensionReferences(&$copyrightReferences) {
+    private function processExtensionReferences(QueryResultInterface|array &$copyrightReferences): void {
 
         $allExtensionTablesConfiguration = $this->settings['extensiontables'];
 
         /** @var ContentObjectRenderer $contentObject */
         $contentObject = GeneralUtility::makeInstance(ContentObjectRenderer::class);
-        /** @var \TYPO3\CMS\Core\Domain\Repository\PageRepository $pageRepository */
-        $pageRepository = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Domain\Repository\PageRepository::class);
+        /** @var PageRepository $pageRepository */
+        $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
 
-        /** @var \TGM\TgmCopyright\Domain\Model\CopyrightReference $copyrightReference */
+        /** @var CopyrightReference $copyrightReference */
         foreach ($copyrightReferences as $copyrightReference) {
 
             $additionalLinkParams = '';
